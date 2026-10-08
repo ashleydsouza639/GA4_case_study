@@ -1,0 +1,23 @@
+config {
+  type: "table",
+  schema: "silver",
+  name: "purchase_traffic_source_medium"
+}
+
+SELECT
+  PARSE_DATE('%Y%m%d', event_date) AS event_date,
+  traffic_source.medium AS traffic_source_medium,
+  user_pseudo_id,
+  (
+    SELECT value.int_value
+    FROM UNNEST(event_params)
+    WHERE key = 'ga_session_id'
+  ) AS ga_session_id,
+  event_value_in_usd,
+  ecommerce.total_item_quantity AS total_item_quantity
+
+FROM ${ref("events_*")}
+
+WHERE event_name = 'purchase'
+  AND COALESCE(traffic_source.medium, '') != '(data deleted)'
+  AND COALESCE(user_pseudo_id, '') != '(data deleted)'

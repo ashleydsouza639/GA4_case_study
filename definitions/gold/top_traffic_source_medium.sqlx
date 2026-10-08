@@ -1,0 +1,18 @@
+config {
+  type: "table",
+  schema: "gold",
+  name: "top_traffic_source_medium"
+}
+
+SELECT
+  DATE_TRUNC(event_date, MONTH) AS month,
+  traffic_source_medium,
+  SUM(event_value_in_usd) AS purchased_value_usd,
+  SUM(total_item_quantity) AS total_purchased_items,
+  AVG(total_item_quantity) AS avg_items_per_purchase
+
+FROM ${ref("purchase_traffic_source_medium")}
+
+GROUP BY
+  month,
+  traffic_source_medium
